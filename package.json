@@ -1,0 +1,25 @@
+{
+    "name": "autoauth-backend",
+    "version": "1.0.0",
+    "description": "NodeJS code logic for communication between front-end and MySQL database",
+    "main": "index.js",
+    "scripts": {
+        "start": "node ./bin/www",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cookie-parser": "~1.4.3",
+        "cors": "^2.8.4",
+        "debug": "~2.6.9",
+        "express": "^4.16.3",
+        "flexqp": "^2.0.4",
+        "flexrb": "0.0.1",
+        "moment": "^2.22.2",
+        "morgan": "~1.9.0",
+        "npm": "^6.1.0",
+        "request": "^2.87.0",
+        "request-promise": "^4.2.2"
+    }
+}
