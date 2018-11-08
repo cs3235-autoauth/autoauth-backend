@@ -14,6 +14,8 @@ This project uses Express 4 for routing and Flex.Query Processor Library 2 for q
 
 5. Open a terminal in this project directory and run `npm start` to start the server, listening on port 4300
 
+After installation, MySQL server will always be running in the background unless you explicitly stop the service dubbed "MySQL80" in services.msc in Windows platform so only Step 5 has to be performed for future runs.
+
 ### Code
 
 Main code logic lies [here](routes/services.js).
