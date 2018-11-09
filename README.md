@@ -4,9 +4,13 @@ This project uses Express 4 for routing and Flex.Query Processor Library 2 for q
 
 ## Required Installs
 
-Both MySQL Server and MySQL Workbench is required.
+*NodeJS, MySQL Server and MySQL Workbench are required.*
 
-MySQL Server
+**NodeJS**
+
+1. Install [NodeJS](https://nodejs.org/en/download/)
+
+**MySQL Server**
 
 1. Download [MySQL Installer Community 8.x](https://dev.mysql.com/downloads/windows/installer/8.0.html)
 
@@ -14,15 +18,15 @@ MySQL Server
 
 3. Follow on-screen instructions to install and proceed with default settings (enter your choice of root password for your MySQL instances when prompted in one of the screens)
 
-4. Update your root user password at [dbConfig.json](dbConfig.json)
+4. Update your root user password in [dbConfig.json](dbConfig.json)
 
-MySQL Workbench
+**MySQL Workbench**
 
 1. Install [MySQL Workbench 8.x CE](https://dev.mysql.com/downloads/workbench/)
 
-2. Double-click "Local instance MySQL80"
+2. Double-click "*Local instance MySQL80*"
 
-3. Go to "Server" Menu > Data Import > "Import from self-Contained File" > open [autoauth table schema](schema/sys_autoauth.sql)
+3. Go to "*Server*" Menu > "*Data Import*" > "Import from self-Contained File" > Open [autoauth table schema](schema/sys_autoauth.sql)
 
 ## Usage
 
