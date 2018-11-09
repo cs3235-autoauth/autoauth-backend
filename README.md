@@ -14,19 +14,19 @@ MySQL Server
 
 3. Follow on-screen instructions to install and proceed with default settings (enter your choice of root password for your MySQL instances when prompted in one of the screens)
 
+4. Update your root user password at [dbConfig.json](dbConfig.json)
+
 MySQL Workbench
 
 1. Install [MySQL Workbench 8.x CE](https://dev.mysql.com/downloads/workbench/)
 
-2. Create a local MySQL instance that runs at localhost
+2. Double-click "Local instance MySQL80"
 
-3. Update your root user credentials at [dbConfig.json](dbConfig.json)
-
-4. Import [autoauth table schema](schema/sys_autoauth.sql) into MySQL
+3. Go to "Server" Menu > Data Import > "Import from self-Contained File" > open [autoauth table schema](schema/sys_autoauth.sql)
 
 ## Usage
 
-5. Open a terminal in this project directory and run `npm start` to start the server, listening on port 4300
+Run `npm start` to start the server, listening on port 4300
 
 ### Code
 
