@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const qp = require('flexqp');
 const rb = require('flexrb');
+const comparator = require('deep-diff').diff;
 
 router.post('/authenticate', async function (req, res, next) {
     try {
@@ -15,7 +16,7 @@ router.post('/authenticate', async function (req, res, next) {
             res.json('Unauthorized.');
         } else {
             console.log(fingerprint_DB);
-            compareJSON(JSON.parse(fingerprint_Incoming), JSON.parse(fingerprint_DB));
+            compareJSON(fingerprint_Incoming, fingerprint_DB);
             res.json(rb.build('Retrieved user successfully.'));
         }
     } catch (err) {
@@ -41,7 +42,9 @@ router.post('/register', async function (req, res, next) {
 })
 
 function compareJSON(a, b) {
-    
+    var diff = comparator(a, b);
+    console.log(diff);
+
 }
 
 module.exports = router;
