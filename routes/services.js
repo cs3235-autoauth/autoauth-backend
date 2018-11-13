@@ -9,7 +9,7 @@ router.post('/authenticate', async function (req, res, next) {
         if (req.err) return next(req.err);
         let fingerprint_Incoming = req.body.fingerprint;
         let email = req.body.email;
-        let fingerprint_DB = await qp.executeAndFetchFirstPromise('SELECT fingerprint FROM autoauth WHERE email like ?', [email]);
+        let fingerprint_DB = await qp.executeAndFetchFirstPromise('SELECT fingerprint FROM autoauth WHERE email LIKE ?', [email]);
 
         if (fingerprint_DB == null) {
             res.statusCode = 401;
@@ -31,8 +31,13 @@ router.post('/register', async function (req, res, next) {
         if (req.err) return next(req.err);
         let fingerprint = JSON.stringify(req.body.fingerprint);
         let email = req.body.email;
-        await qp.execute('INSERT into autoauth SET fingerprint = ?, email = ?', [fingerprint, email], con);
-        await qp.commitAndCloseConnection(con);
+        let result = await qp.executeAndFetchFirstPromise('SELECT * FROM autoauth WHERE email LIKE ?', [email]);                
+        if (result != null) {
+            await qp.executeUpdatePromise('UPDATE autoauth SET fingerprint = ? WHERE email LIKE ?', [fingerprint, email]);
+        } else {
+            await qp.execute('INSERT into autoauth SET fingerprint = ?, email = ?', [fingerprint, email], con);
+            await qp.commitAndCloseConnection(con);
+        }
         res.json(rb.build('Created user successfully.'));
     } catch (err) {
         await qp.rollbackAndCloseConnection(con);
