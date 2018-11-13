@@ -13,6 +13,7 @@
         "cookie-parser": "~1.4.3",
         "cors": "^2.8.4",
         "debug": "~2.6.9",
+        "deep-diff": "^1.0.2",
         "express": "^4.16.3",
         "flexqp": "^2.0.4",
         "flexrb": "0.0.1",
