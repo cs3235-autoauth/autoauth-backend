@@ -28,6 +28,8 @@ This project uses Express 4 for routing and Flex.Query Processor Library 2 for q
 
 3. Go to "*Server*" Menu > "*Data Import*" > "Import from self-Contained File" > Open [autoauth table schema](schema/sys_autoauth.sql)
 
+4. Run the following command: ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'YOURPASSWORDHERE'
+
 ## Usage
 
 Run `npm start` to start the server, listening on port 4300
