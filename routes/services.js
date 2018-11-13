@@ -2,21 +2,23 @@ const express = require('express');
 const router = express.Router();
 const qp = require('flexqp');
 const rb = require('flexrb');
+const _ = require("lodash");
 const comparator = require('deep-diff').diff;
 
 router.post('/authenticate', async function (req, res, next) {
     try {
         if (req.err) return next(req.err);
-        let fingerprint_Incoming = req.body.fingerprint;
+        let fp_to_check = req.body.fingerprint;
         let email = req.body.email;
-        let fingerprint_DB = await qp.executeAndFetchFirstPromise('SELECT fingerprint FROM autoauth WHERE email like ?', [email]);
+        let fp_stored = await qp.executeAndFetchFirstPromise('SELECT fingerprint FROM sys.autoauth WHERE email like ?', [email]);
 
-        if (fingerprint_DB == null) {
+        if (fp_stored == null || 
+            !isMatched(fp_to_check, fp_stored.fingerprint)) 
+        {
             res.statusCode = 401;
             res.json('Unauthorized.');
         } else {
-            console.log(fingerprint_DB);
-            compareJSON(fingerprint_Incoming, fingerprint_DB);
+            console.log(email + " authenticated");
             res.json(rb.build('Retrieved user successfully.'));
         }
     } catch (err) {
@@ -41,10 +43,79 @@ router.post('/register', async function (req, res, next) {
     }
 })
 
-function compareJSON(a, b) {
-    var diff = comparator(a, b);
-    console.log(diff);
+function isMatched(check, stored) {
+    let weight_map = {
+        "adBlock": 1,
+        "addBehavior": 1,
+        "audio": 1, 
+        "availableScreenResolution": 1,
+        "canvas": 1,
+        "colorDepth": 1,
+        "cpuClass": 1,
+        "deviceMemory": 5,
+        "doNotTrack": 1,
+        "enumerateDevice": 1,
+        "fonts": 1,
+        "hardwareConcurrency": 5,
+        "indexedDb":1, 
+        "language": 1,
+        "localStorage": 1, 
+        "openDatabase": 1,
+        "pixelRatio":1, 
+        "platform":10, 
+        "plugins":1, 
+        "screenResolution": 1,
+        "sessionStorage":1, 
+        "timezone": 10,
+        "timezoneOffset":1, 
+        "touchSupport": 5,
+        "userAgent": 1,
+        "webgl": 1,
+        "webglVendorAndRenderer":1, 
+    };
 
+    
+    //Check stored fp against the incoming fp
+    let diff_stored_in = 0;
+    for (var i in stored) {
+        if(stored.hasOwnProperty(i)) {
+            if(!_.isEqual(stored[i],check[i])) {
+                if(stored[i] === "unknown" || check[i] === "unknown") {
+                    diff_stored_in += 1;
+                } else {
+                    diff_stored_in += weight_map[i];
+                }
+                console.log(i);
+                console.log("Stored: " + stored[i]);
+                console.log("Checked:" + check[i]);
+                console.log("-----------------");
+            }
+        }
+    }
+    
+    //Check the reverse 
+    let diff_in_stored = 0;
+    for (var i in check) {
+        if(check.hasOwnProperty(i)) {
+            if(!_.isEqual(stored[i],check[i])) {
+                if(stored[i] === "unknown" || check[i] === "unknown") {
+                    diff_in_stored += 1;
+                } else {
+                    diff_in_stored += weight_map[i];
+                }
+                console.log(i);
+                console.log("Stored: " + stored[i]);
+                console.log("Checked:" + check[i]);
+                console.log("-----------------");
+            }
+        }
+    }
+
+    if(diff_in_stored > 20 || diff_stored_in > 20) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 module.exports = router;
