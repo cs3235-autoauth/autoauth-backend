@@ -37,12 +37,13 @@ router.post('/register', async function (req, res, next) {
     try {
         if (req.err) return next(req.err);
         let fingerprint = JSON.stringify(req.body.fingerprint);
+        let level = req.body.level;
         let email = req.body.email;
         let result = await qp.executeAndFetchFirstPromise('SELECT * FROM autoauth WHERE email LIKE ?', [email]);                
         if (result != null) {
-            await qp.executeUpdatePromise('UPDATE autoauth SET fingerprint = ? WHERE email LIKE ?', [fingerprint, email]);
+            await qp.executeUpdatePromise('UPDATE autoauth SET fingerprint = ?, level = ? WHERE email LIKE ?', [fingerprint, level, email]);
         } else {
-            await qp.execute('INSERT into autoauth SET fingerprint = ?, email = ?', [fingerprint, email], con);
+            await qp.execute('INSERT into autoauth SET fingerprint = ?, email = ?, level = ?', [fingerprint, email, level], con);
             await qp.commitAndCloseConnection(con);
         }
         res.json(rb.build('Created user successfully.'));
