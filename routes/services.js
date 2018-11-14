@@ -25,7 +25,7 @@ router.post('/authenticate', async function (req, res, next) {
             console.log(email + " authenticated");
             res.json(rb.build({
                 'msg': 'Retrieved user successfully.',
-                'stored_fp' : fp_stored.fingerprint,
+                'stored_fp' : JSON.parse(fp_stored.fingerprint),
                 'incoming_fp' : fp_to_check,
             }));
             
