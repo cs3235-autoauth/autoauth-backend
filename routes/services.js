@@ -54,6 +54,7 @@ router.post('/register', async function (req, res, next) {
 })
 
 function isMatched(check, stored) {
+    let DIFF_THRESDHOLD = 20;
     let weight_map = {
         "adBlock": 1,
         "addBehavior": 1,
@@ -86,14 +87,15 @@ function isMatched(check, stored) {
 
     
     //Check stored fp against the incoming fp
-    let diff_stored_in = 0;
+    let diff = 0;
     for (var i in stored) {
         if(stored.hasOwnProperty(i)) {
             if(!_.isEqual(stored[i],check[i])) {
+                //FIXME: Should we penalize unknown less heavily?
                 if(stored[i] === "unknown" || check[i] === "unknown") {
-                    diff_stored_in += 1;
+                    diff += 1;
                 } else {
-                    diff_stored_in += weight_map[i];
+                    diff += weight_map[i];
                 }
                 console.log(i);
                 console.log("Stored: " + stored[i]);
@@ -103,25 +105,8 @@ function isMatched(check, stored) {
         }
     }
     
-    //Check the reverse 
-    let diff_in_stored = 0;
-    for (var i in check) {
-        if(check.hasOwnProperty(i)) {
-            if(!_.isEqual(stored[i],check[i])) {
-                if(stored[i] === "unknown" || check[i] === "unknown") {
-                    diff_in_stored += 1;
-                } else {
-                    diff_in_stored += weight_map[i];
-                }
-                console.log(i);
-                console.log("Stored: " + stored[i]);
-                console.log("Checked:" + check[i]);
-                console.log("-----------------");
-            }
-        }
-    }
 
-    if(diff_in_stored > 20 || diff_stored_in > 20) {
+    if(diff > DIFF_THRESDHOLD) {
         return false;
     } else {
         return true;
