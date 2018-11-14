@@ -85,31 +85,90 @@ function isMatched(check, stored) {
         "webglVendorAndRenderer":1, 
     };
 
+    let attribToCheck = {
+        "adBlock": genericMatcher,
+        "addBehavior": genericMatcher,
+        "audio": genericMatcher, 
+        "availableScreenResolution": genericMatcher,
+        "canvas": genericMatcher,
+        "colorDepth": genericMatcher,
+        "cpuClass": genericMatcher,
+        "deviceMemory": genericMatcher,
+        "doNotTrack": genericMatcher,
+        "enumerateDevice": genericMatcher,
+        "fonts": genericMatcher,
+        "hardwareConcurrency": genericMatcher,
+        "indexedDb":genericMatcher, 
+        "language": genericMatcher,
+        "localStorage": genericMatcher, 
+        "openDatabase": genericMatcher,
+        "pixelRatio":genericMatcher, 
+        "platform":genericMatcher, 
+        "plugins":genericMatcher, 
+        "screenResolution": genericMatcher,
+        "sessionStorage":genericMatcher, 
+        "timezone": matchTimezone,
+        "timezoneOffset":genericMatcher, 
+        "touchSupport": genericMatcher,
+        "userAgent": genericMatcher,
+        "webgl": genericMatcher,
+        "webglVendorAndRenderer":genericMatcher, 
+    }
     
     //Check stored fp against the incoming fp
     let diff = 0;
+    
     for (var i in stored) {
         if(stored.hasOwnProperty(i)) {
             if(!_.isEqual(stored[i],check[i])) {
+                
+                let weightToAdd = 0
+
                 //FIXME: Should we penalize unknown less heavily?
                 if(stored[i] === "unknown" || check[i] === "unknown") {
-                    diff += 1;
+                    weightToAdd = 1;
                 } else {
-                    diff += weight_map[i];
+                    weightToAdd = attribToCheck[i](i, stored[i], check[i]);
                 }
+                diff += weightToAdd;
                 console.log(i);
                 console.log("Stored: " + stored[i]);
                 console.log("Checked:" + check[i]);
+                console.log("Weight Added: " + weightToAdd);
                 console.log("-----------------");
             }
         }
     }
+
+    console.log("Total Weight: " + diff)
     
 
     if(diff > DIFF_THRESDHOLD) {
         return false;
     } else {
         return true;
+    }
+
+    // List of matching functions
+    function matchTimezone(i, storedVal, checkVal)
+    {   
+        if(storedVal === "unknown" || checkVal === "unknown") {
+            return 1;
+        } 
+        let storedRes = stored[i].split("/");
+        let checkRes = check[i].split("/");
+        if (storedRes[0] == checkRes[0])
+            return 0.5;
+        return 1;
+    }
+
+    function genericMatcher(i, storedVal, checkVal) 
+    {   
+        if(storedVal === "unknown" || checkVal === "unknown") {
+            return 1;
+        } else {
+            return weight_map[i];
+        }
     }
 }
 
