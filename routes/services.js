@@ -5,13 +5,17 @@ const rb = require('flexrb');
 const _ = require("lodash");
 const comparator = require('deep-diff').diff;
 
+const SEC_LVL_HIGH =    3;
+const SEC_LVL_MED =     2;
+const SEC_LVL_LOW =     1;
+
 router.post('/authenticate', async function (req, res, next) {
     try {
         if (req.err) return next(req.err);
         let fp_to_check = req.body.fingerprint;
         let email = req.body.email;
-        let fp_stored = await qp.executeAndFetchFirstPromise('SELECT fingerprint FROM sys.autoauth WHERE email like ?', [email]);
-
+        let fp_stored = await qp.executeAndFetchFirstPromise('SELECT fingerprint, level FROM sys.autoauth WHERE email like ?', [email]);
+    
         if (fp_stored == null || 
             !isMatched(fp_to_check, fp_stored.fingerprint, fp_stored.level)) 
         {
@@ -56,11 +60,11 @@ router.post('/register', async function (req, res, next) {
 
 function isMatched(check, stored, sec_lvl) {
     var DIFF_THRESDHOLD;
-    
+
     /* Adujst thresdhold based on  security level */
-    if(sec_lvl === 'low') {
+    if(sec_lvl === SEC_LVL_LOW) {
         DIFF_THRESDHOLD = 20;
-    } else if ( sec_lvl === 'med')  {
+    } else if ( sec_lvl === SEC_LVL_MED)  {
         DIFF_THRESDHOLD = 10;
     } else { 
         // Default to be high => same browser same setting
@@ -70,6 +74,7 @@ function isMatched(check, stored, sec_lvl) {
         DIFF_THRESDHOLD = 0;
     }
 
+    console.log("Adjusted Thd: " + DIFF_THRESDHOLD);
     let weight_map = {
         "adBlock": 1,
         "addBehavior": 1,
@@ -136,16 +141,8 @@ function isMatched(check, stored, sec_lvl) {
     for (var i in stored) {
         if(stored.hasOwnProperty(i)) {
             if(!_.isEqual(stored[i],check[i])) {
-                
-                let weightToAdd = 0
-
-                //FIXME: Should we penalize unknown less heavily?
-                if(stored[i] === "unknown" || check[i] === "unknown") {
-                    weightToAdd = 1;
-                } else {
-                    weightToAdd = attribToCheck[i](i, stored[i], check[i]);
-                }
-                diff += weightToAdd;
+                let weightToAdd = attribToCheck[i](i, stored[i], check[i]);
+                diff += attribToCheck[i](i, stored[i], check[i])
                 console.log(i);
                 console.log("Stored: " + stored[i]);
                 console.log("Checked:" + check[i]);
