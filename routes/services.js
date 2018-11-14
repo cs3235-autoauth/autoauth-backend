@@ -19,7 +19,12 @@ router.post('/authenticate', async function (req, res, next) {
             res.json('Unauthorized.');
         } else {
             console.log(email + " authenticated");
-            res.json(rb.build('Retrieved user successfully.'));
+            res.json(rb.build({
+                'msg': 'Retrieved user successfully.',
+                'stored_fp' : fp_stored.fingerprint,
+                'incoming_fp' : fp_to_check,
+            }));
+            
         }
     } catch (err) {
         err.status = 406;
