@@ -140,9 +140,16 @@ function isMatched(check, stored, sec_lvl) {
     
     for (var i in stored) {
         if(stored.hasOwnProperty(i)) {
-            if(!_.isEqual(stored[i],check[i])) {
-                let weightToAdd = attribToCheck[i](i, stored[i], check[i]);
-                diff += attribToCheck[i](i, stored[i], check[i])
+            if(!_.isEqual(stored[i],check[i])) {                                
+                let weightToAdd = 0
+                //FIXME: Should we penalize unknown less heavily?
+                if(stored[i] === "unknown" || check[i] === "unknown") {
+                    weightToAdd = 1;
+                } else {
+                    weightToAdd = attribToCheck[i](i, stored[i], check[i]);
+                }
+                diff += weightToAdd;
+
                 console.log(i);
                 console.log("Stored: " + stored[i]);
                 console.log("Checked:" + check[i]);
@@ -164,9 +171,6 @@ function isMatched(check, stored, sec_lvl) {
     // List of matching functions
     function matchTimezone(i, storedVal, checkVal)
     {   
-        if(storedVal === "unknown" || checkVal === "unknown") {
-            return 1;
-        } 
         let storedRes = stored[i].split("/");
         let checkRes = check[i].split("/");
         if (storedRes[0] == checkRes[0])
@@ -176,11 +180,8 @@ function isMatched(check, stored, sec_lvl) {
 
     function genericMatcher(i, storedVal, checkVal) 
     {   
-        if(storedVal === "unknown" || checkVal === "unknown") {
-            return 1;
-        } else {
-            return weight_map[i];
-        }
+        // Returns max weight since value is different
+        return weight_map[i];
     }
 }
 
