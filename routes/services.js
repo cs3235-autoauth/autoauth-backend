@@ -167,9 +167,6 @@ function isMatched(check, stored, sec_lvl) {
     // List of matching functions
     function matchTimezone(i, storedVal, checkVal)
     {   
-        if(storedVal === "unknown" || checkVal === "unknown") {
-            return 1;
-        } 
         let storedRes = stored[i].split("/");
         let checkRes = check[i].split("/");
         if (storedRes[0] == checkRes[0])
@@ -179,11 +176,8 @@ function isMatched(check, stored, sec_lvl) {
 
     function genericMatcher(i, storedVal, checkVal) 
     {   
-        if(storedVal === "unknown" || checkVal === "unknown") {
-            return 1;
-        } else {
-            return weight_map[i];
-        }
+        // Returns max weight since value is different
+        return weight_map[i];
     }
 }
 
