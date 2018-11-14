@@ -13,7 +13,7 @@ router.post('/authenticate', async function (req, res, next) {
         let fp_stored = await qp.executeAndFetchFirstPromise('SELECT fingerprint FROM sys.autoauth WHERE email like ?', [email]);
 
         if (fp_stored == null || 
-            !isMatched(fp_to_check, fp_stored.fingerprint)) 
+            !isMatched(fp_to_check, fp_stored.fingerprint, fp_stored.level)) 
         {
             res.statusCode = 401;
             res.json('Unauthorized.');
@@ -53,8 +53,22 @@ router.post('/register', async function (req, res, next) {
     }
 })
 
-function isMatched(check, stored) {
-    let DIFF_THRESDHOLD = 20;
+function isMatched(check, stored, sec_lvl) {
+    var DIFF_THRESDHOLD;
+    
+    /* Adujst thresdhold based on  security level */
+    if(sec_lvl === 'low') {
+        DIFF_THRESDHOLD = 20;
+    } else if ( sec_lvl === 'med')  {
+        DIFF_THRESDHOLD = 10;
+    } else { 
+        // Default to be high => same browser same setting
+        // E.g.: 
+        //- Entering private mode with AdBlock off
+        //- Sending do not track in request
+        DIFF_THRESDHOLD = 0;
+    }
+
     let weight_map = {
         "adBlock": 1,
         "addBehavior": 1,
