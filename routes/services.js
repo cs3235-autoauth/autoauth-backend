@@ -140,9 +140,16 @@ function isMatched(check, stored, sec_lvl) {
     
     for (var i in stored) {
         if(stored.hasOwnProperty(i)) {
-            if(!_.isEqual(stored[i],check[i])) {
-                let weightToAdd = attribToCheck[i](i, stored[i], check[i]);
-                diff += attribToCheck[i](i, stored[i], check[i])
+            if(!_.isEqual(stored[i],check[i])) {                                
+                let weightToAdd = 0
+                //FIXME: Should we penalize unknown less heavily?
+                if(stored[i] === "unknown" || check[i] === "unknown") {
+                    weightToAdd = 1;
+                } else {
+                    weightToAdd = attribToCheck[i](i, stored[i], check[i]);
+                }
+                diff += weightToAdd;
+
                 console.log(i);
                 console.log("Stored: " + stored[i]);
                 console.log("Checked:" + check[i]);
